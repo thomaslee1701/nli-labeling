@@ -17,6 +17,11 @@ class LabelingTool {
             this.handleFileUpload(e);
         });
 
+        // Replace file input change event
+        document.getElementById('replace-file-input').addEventListener('change', (e) => {
+            this.handleReplaceFileSelection(e);
+        });
+
         // Keyboard shortcuts
         document.addEventListener('keydown', (e) => {
             this.handleKeyboardShortcuts(e);
@@ -122,6 +127,9 @@ class LabelingTool {
         document.getElementById('labeling-section').style.display = 'block';
         document.getElementById('labeling-section').classList.add('fade-in');
         document.getElementById('progress-indicator').style.display = 'block';
+        
+        // Update current file name display
+        document.getElementById('current-file-name').textContent = this.fileName || 'Unknown file';
     }
 
     updateDisplay() {
@@ -320,6 +328,79 @@ class LabelingTool {
         }, 5000);
     }
 
+    handleReplaceFileSelection(event) {
+        const file = event.target.files[0];
+        if (!file) {
+            document.getElementById('confirm-replace-btn').disabled = true;
+            document.getElementById('replace-file-info').style.display = 'none';
+            return;
+        }
+
+        if (file.type !== 'application/json') {
+            this.showError('Please select a valid JSON file.');
+            document.getElementById('confirm-replace-btn').disabled = true;
+            return;
+        }
+
+        // Show file info
+        const replaceFileName = document.getElementById('replace-file-name');
+        const replaceFileSize = document.getElementById('replace-file-size');
+        const replaceFileInfo = document.getElementById('replace-file-info');
+        
+        replaceFileName.textContent = file.name;
+        replaceFileSize.textContent = this.formatFileSize(file.size);
+        replaceFileInfo.style.display = 'block';
+        
+        // Enable replace button
+        document.getElementById('confirm-replace-btn').disabled = false;
+    }
+
+    replaceDataset(jsonData, fileName) {
+        // Validate the new data using the same validation logic
+        if (!Array.isArray(jsonData)) {
+            this.showError('JSON data must be an array of objects.');
+            return;
+        }
+
+        const invalidItems = [];
+        jsonData.forEach((item, index) => {
+            if (!item.hasOwnProperty('hypothesis') || !item.hasOwnProperty('premise')) {
+                invalidItems.push(index + 1);
+            }
+        });
+
+        if (invalidItems.length > 0) {
+            this.showError(`Invalid data format. Items at positions ${invalidItems.join(', ')} are missing "hypothesis" or "premise" keys.`);
+            return;
+        }
+
+        if (jsonData.length === 0) {
+            this.showError('The uploaded file contains no data items.');
+            return;
+        }
+
+        // Replace the current dataset
+        this.data = jsonData;
+        this.labels = {};
+        this.currentIndex = 0;
+        this.fileName = fileName;
+        
+        // Initialize labels with existing ones if they exist
+        this.data.forEach((item, index) => {
+            if (item.hasOwnProperty('label')) {
+                this.labels[index] = item.label;
+            }
+        });
+
+        // Update the interface
+        this.saveToStorage();
+        this.updateDisplay();
+        document.getElementById('current-file-name').textContent = this.fileName;
+        
+        // Show success message
+        this.showToast(`Successfully replaced dataset with ${this.data.length} new items.`);
+    }
+
     showToast(message) {
         // Create a temporary toast for success messages
         const toast = document.createElement('div');
@@ -362,6 +443,40 @@ function exportData() {
 
 function hideError() {
     document.getElementById('error-alert').style.display = 'none';
+}
+
+function showFileReplace() {
+    const modal = new bootstrap.Modal(document.getElementById('fileReplaceModal'));
+    modal.show();
+    
+    // Reset the modal state
+    document.getElementById('replace-file-input').value = '';
+    document.getElementById('confirm-replace-btn').disabled = true;
+    document.getElementById('replace-file-info').style.display = 'none';
+}
+
+function confirmFileReplace() {
+    const fileInput = document.getElementById('replace-file-input');
+    const file = fileInput.files[0];
+    
+    if (!file) return;
+    
+    // Read and process the new file
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        try {
+            const jsonData = JSON.parse(e.target.result);
+            window.labelingTool.replaceDataset(jsonData, file.name);
+            
+            // Close the modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('fileReplaceModal'));
+            modal.hide();
+        } catch (error) {
+            window.labelingTool.showError('Invalid JSON file. Please check the file format and try again.');
+            console.error('JSON parsing error:', error);
+        }
+    };
+    reader.readAsText(file);
 }
 
 // Initialize the application when the page loads

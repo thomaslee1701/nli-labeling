@@ -62,6 +62,22 @@
 
             <!-- Labeling Interface -->
             <div id="labeling-section" style="display: none;">
+                <!-- File Management Controls -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-file-alt text-primary me-2"></i>
+                                <span class="text-muted">Current file: <strong id="current-file-name"></strong></span>
+                            </div>
+                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="showFileReplace()">
+                                <i class="fas fa-file-upload me-2"></i>
+                                Upload New File
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Progress Bar -->
                 <div class="row mb-4">
                     <div class="col-12">
@@ -192,6 +208,43 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- File Replace Modal -->
+    <div class="modal fade" id="fileReplaceModal" tabindex="-1" aria-labelledby="fileReplaceModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="fileReplaceModalLabel">
+                        <i class="fas fa-file-upload me-2"></i>
+                        Upload New Dataset
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-warning" role="alert">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Warning:</strong> Uploading a new file will replace your current dataset and all unsaved labels will be lost.
+                    </div>
+                    <div class="mb-3">
+                        <label for="replace-file-input" class="form-label">Select new JSON file:</label>
+                        <input type="file" id="replace-file-input" accept=".json" class="form-control">
+                    </div>
+                    <div id="replace-file-info" class="text-muted small" style="display: none;">
+                        <i class="fas fa-file-alt me-2"></i>
+                        <span id="replace-file-name"></span>
+                        <span class="ms-2">(<span id="replace-file-size"></span>)</span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="confirmFileReplace()" id="confirm-replace-btn" disabled>
+                        <i class="fas fa-upload me-2"></i>
+                        Replace Dataset
+                    </button>
                 </div>
             </div>
         </div>
