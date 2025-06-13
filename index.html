@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Entailment Labeling Tool</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container-fluid">
+        <!-- Header -->
+        <nav class="navbar navbar-dark bg-primary mb-4">
+            <div class="container">
+                <span class="navbar-brand mb-0 h1">
+                    <i class="fas fa-tags me-2"></i>
+                    Text Entailment Labeling Tool
+                </span>
+                <div class="navbar-text text-white" id="progress-indicator" style="display: none;">
+                    <span id="current-index">0</span> / <span id="total-items">0</span>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="container">
+            <!-- File Upload Section -->
+            <div id="upload-section" class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="card shadow">
+                        <div class="card-body text-center p-5">
+                            <i class="fas fa-upload fa-3x text-primary mb-4"></i>
+                            <h2 class="card-title mb-4">Upload JSON Dataset</h2>
+                            <p class="card-text text-muted mb-4">
+                                Upload a JSON file containing hypothesis-premise pairs for labeling.
+                                Each item should have "hypothesis" and "premise" keys.
+                            </p>
+                            <div class="mb-4">
+                                <input type="file" id="file-input" accept=".json" class="form-control d-none">
+                                <button type="button" class="btn btn-primary btn-lg" onclick="document.getElementById('file-input').click()">
+                                    <i class="fas fa-file-upload me-2"></i>
+                                    Choose JSON File
+                                </button>
+                            </div>
+                            <div id="file-info" class="text-muted" style="display: none;">
+                                <i class="fas fa-file-alt me-2"></i>
+                                <span id="file-name"></span>
+                                <span class="ms-2">(<span id="file-size"></span>)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Error Alert -->
+            <div id="error-alert" class="alert alert-danger alert-dismissible fade show" role="alert" style="display: none;">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <span id="error-message"></span>
+                <button type="button" class="btn-close" aria-label="Close" onclick="hideError()"></button>
+            </div>
+
+            <!-- Labeling Interface -->
+            <div id="labeling-section" style="display: none;">
+                <!-- Progress Bar -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="progress" style="height: 8px;">
+                            <div id="progress-bar" class="progress-bar bg-success" role="progressbar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Text Pairs Display -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card shadow">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-text-width me-2"></i>
+                                    Text Pair #<span id="item-number">1</span>
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h6 class="text-primary mb-3">
+                                            <i class="fas fa-quote-left me-2"></i>
+                                            Premise
+                                        </h6>
+                                        <div id="premise-text" class="p-3 bg-light rounded border-start border-primary border-4">
+                                            <!-- Premise text will be inserted here -->
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6 class="text-success mb-3">
+                                            <i class="fas fa-question-circle me-2"></i>
+                                            Hypothesis
+                                        </h6>
+                                        <div id="hypothesis-text" class="p-3 bg-light rounded border-start border-success border-4">
+                                            <!-- Hypothesis text will be inserted here -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Labeling Options -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card shadow">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-tags me-2"></i>
+                                    Select Label
+                                    <small class="text-muted ms-2">(Use keys 1, 2, 3 for quick labeling)</small>
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <button type="button" class="btn btn-outline-danger btn-lg w-100 label-btn" 
+                                                data-label="contradiction" onclick="selectLabel('contradiction')">
+                                            <i class="fas fa-times-circle me-2"></i>
+                                            <span class="d-block">Contradiction</span>
+                                            <small class="d-block text-muted">Press 1</small>
+                                        </button>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <button type="button" class="btn btn-outline-warning btn-lg w-100 label-btn" 
+                                                data-label="neutral" onclick="selectLabel('neutral')">
+                                            <i class="fas fa-minus-circle me-2"></i>
+                                            <span class="d-block">Neutral</span>
+                                            <small class="d-block text-muted">Press 2</small>
+                                        </button>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <button type="button" class="btn btn-outline-success btn-lg w-100 label-btn" 
+                                                data-label="entailment" onclick="selectLabel('entailment')">
+                                            <i class="fas fa-check-circle me-2"></i>
+                                            <span class="d-block">Entailment</span>
+                                            <small class="d-block text-muted">Press 3</small>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Controls -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <button type="button" id="prev-btn" class="btn btn-secondary" onclick="navigateItem(-1)">
+                                <i class="fas fa-chevron-left me-2"></i>
+                                Previous
+                            </button>
+                            
+                            <div class="text-center">
+                                <span class="badge bg-info fs-6 px-3 py-2">
+                                    <span id="labeled-count">0</span> of <span id="total-count">0</span> labeled
+                                </span>
+                            </div>
+                            
+                            <button type="button" id="next-btn" class="btn btn-secondary" onclick="navigateItem(1)">
+                                Next
+                                <i class="fas fa-chevron-right ms-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Export Section -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card shadow border-success">
+                            <div class="card-body text-center">
+                                <h5 class="card-title text-success">
+                                    <i class="fas fa-download me-2"></i>
+                                    Export Labeled Data
+                                </h5>
+                                <p class="card-text text-muted mb-3">
+                                    Download your labeled dataset as a JSON file with the added "label" field.
+                                </p>
+                                <button type="button" class="btn btn-success btn-lg" onclick="exportData()" id="export-btn">
+                                    <i class="fas fa-file-download me-2"></i>
+                                    Export JSON
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Keyboard Shortcuts Help -->
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1000;">
+        <div class="toast" id="keyboard-help" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <i class="fas fa-keyboard text-primary me-2"></i>
+                <strong class="me-auto">Keyboard Shortcuts</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                <div class="small">
+                    <div><kbd>1</kbd> - Contradiction</div>
+                    <div><kbd>2</kbd> - Neutral</div>
+                    <div><kbd>3</kbd> - Entailment</div>
+                    <div><kbd>←</kbd> - Previous</div>
+                    <div><kbd>→</kbd> - Next</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

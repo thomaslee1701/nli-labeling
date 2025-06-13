@@ -1,0 +1,225 @@
+/* Custom styles for the Text Entailment Labeling Tool */
+
+body {
+    background-color: #f8f9fa;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Card styling */
+.card {
+    border: none;
+    border-radius: 12px;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Upload section styling */
+#upload-section .card {
+    border: 2px dashed #dee2e6;
+    background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+}
+
+#upload-section .card:hover {
+    border-color: #0d6efd;
+    background: linear-gradient(135deg, #fff 0%, #e3f2fd 100%);
+}
+
+/* Text display styling */
+#premise-text, #hypothesis-text {
+    font-size: 1.1em;
+    line-height: 1.6;
+    min-height: 120px;
+    word-wrap: break-word;
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%) !important;
+}
+
+/* Label button styling */
+.label-btn {
+    height: 100px;
+    font-size: 1.1em;
+    font-weight: 500;
+    border-width: 2px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.label-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.label-btn.active {
+    transform: scale(1.05);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+/* Active label button states */
+.label-btn[data-label="contradiction"].active {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: white;
+}
+
+.label-btn[data-label="neutral"].active {
+    background-color: #ffc107;
+    border-color: #ffc107;
+    color: #000;
+}
+
+.label-btn[data-label="entailment"].active {
+    background-color: #198754;
+    border-color: #198754;
+    color: white;
+}
+
+/* Progress bar styling */
+.progress {
+    background-color: #e9ecef;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    transition: width 0.6s ease;
+    border-radius: 10px;
+}
+
+/* Navigation button styling */
+#prev-btn, #next-btn {
+    min-width: 120px;
+    font-weight: 500;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+#prev-btn:hover, #next-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+#prev-btn:disabled, #next-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* File info styling */
+#file-info {
+    font-size: 0.9em;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 6px;
+    border: 1px solid #dee2e6;
+}
+
+/* Badge styling */
+.badge {
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
+/* Toast styling */
+.toast {
+    background-color: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+}
+
+/* Error alert styling */
+.alert-danger {
+    border-radius: 10px;
+    border: none;
+    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .container {
+        padding: 0 15px;
+    }
+    
+    .label-btn {
+        height: 80px;
+        font-size: 1em;
+        margin-bottom: 10px;
+    }
+    
+    #premise-text, #hypothesis-text {
+        min-height: 100px;
+        font-size: 1em;
+        margin-bottom: 20px;
+    }
+    
+    .navbar-brand {
+        font-size: 1.1em;
+    }
+}
+
+@media (max-width: 576px) {
+    .label-btn {
+        height: 70px;
+        font-size: 0.9em;
+    }
+    
+    #premise-text, #hypothesis-text {
+        min-height: 80px;
+        padding: 15px !important;
+    }
+    
+    .card-body {
+        padding: 1rem;
+    }
+}
+
+/* Animation for smooth transitions */
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Highlight animation for successful actions */
+.highlight {
+    animation: highlight 0.6s ease-in-out;
+}
+
+@keyframes highlight {
+    0% { background-color: transparent; }
+    50% { background-color: rgba(40, 167, 69, 0.2); }
+    100% { background-color: transparent; }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
